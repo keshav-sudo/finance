@@ -36,6 +36,17 @@ export type EnvConfig = z.infer<typeof envSchema>;
  * Throws a descriptive error if validation fails.
  */
 function loadConfig(): EnvConfig {
+  // If running on Vercel, auto-populate URLs based on VERCEL_URL if they are not set
+  if (process.env.VERCEL_URL) {
+    const protocol = 'https';
+    if (!process.env.FRONTEND_URL) {
+      process.env.FRONTEND_URL = `${protocol}://${process.env.VERCEL_URL}`;
+    }
+    if (!process.env.BETTER_AUTH_URL) {
+      process.env.BETTER_AUTH_URL = `${protocol}://${process.env.VERCEL_URL}/_/backend`;
+    }
+  }
+
   const result = envSchema.safeParse(process.env);
 
   if (!result.success) {

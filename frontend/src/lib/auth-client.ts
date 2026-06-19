@@ -15,8 +15,10 @@ import { createAuthClient } from 'better-auth/react';
 import { organizationClient } from 'better-auth/client/plugins';
 
 export const authClient = createAuthClient({
-  /** Base URL of the backend API where Better Auth is mounted */
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 
+    (typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
+      ? '/_/backend' 
+      : 'http://localhost:3001'),
 
   /** Organization plugin for multi-tenancy support on the client */
   plugins: [organizationClient()],
