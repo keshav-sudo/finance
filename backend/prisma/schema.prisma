@@ -1,0 +1,179 @@
+/**
+ * Prisma Schema — Vessify Finance Extractor
+ * 
+ * This schema defines the data model for the application.
+ * It integrates with Better Auth's required tables (user, session, account,
+ * verification) while adding our domain-specific Transaction model.
+ * 
+ * Key design decisions:
+ * - Every transaction is scoped to both userId AND organizationId for true data isolation
+ * - Composite indexes on (organizationId, createdAt) for efficient org-scoped queries
+ * - Cursor-based pagination uses createdAt + id for stable ordering
+ * - Better Auth tables follow their required schema exactly
+ */
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────
+// Better Auth Required Models
+// ──────────────────────────────────────────────
+
+model user {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions      session[]
+  accounts      account[]
+  transactions  transaction[]
+  members       member[]
+
+  @@map("users")
+}
+
+model session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+
+  userId String
+  user   user   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  activeOrganizationId String?
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+model account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verifications")
+}
+
+// ──────────────────────────────────────────────
+// Better Auth Organization / Multi-Tenancy Models
+// ──────────────────────────────────────────────
+
+model organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  logo      String?
+  metadata  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members      member[]
+  invitations  invitation[]
+  transactions transaction[]
+
+  @@map("organizations")
+}
+
+model member {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  role           String   @default("member")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         user         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@map("members")
+}
+
+model invitation {
+  id               String    @id @default(cuid())
+  organizationId   String
+  email            String
+  role             String    @default("member")
+  status           String    @default("pending")
+  expiresAt        DateTime
+  inviterId        String
+
+  organization organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("invitations")
+}
+
+// ──────────────────────────────────────────────
+// Domain Model — Transaction
+// ──────────────────────────────────────────────
+
+model transaction {
+  id          String   @id @default(cuid())
+  date        DateTime
+  description String
+  amount      Float
+  type        String   // 'DEBIT' | 'CREDIT'
+  balance     Float?
+  category    String?
+  reference   String?
+  confidence  Float    @default(0)
+  rawText     String   // Original text that was parsed
+
+  // Ownership — dual-key isolation
+  userId         String
+  organizationId String
+
+  user         user         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Performance indexes for org-scoped queries + cursor pagination
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([organizationId, userId])
+  @@map("transactions")
+}
