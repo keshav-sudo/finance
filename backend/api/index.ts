@@ -24,7 +24,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const url = new URL(req.url ?? '/', `${protocol}://${host}`);
 
   // Collect the body (Vercel parses JSON automatically, we need to re-serialize)
-  let body: BodyInit | undefined;
+  let body: string | undefined;
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     if (req.body !== undefined && req.body !== null) {
       body = JSON.stringify(req.body);
