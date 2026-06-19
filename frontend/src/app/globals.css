@@ -1,0 +1,217 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Custom brand colors */
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+}
+
+/* 
+ * Premium Light Theme — Clean, Elegant Finance UI
+ * Inspired by modern fintech apps (Mercury, Ramp, Wise)
+ * Uses a refined blue-violet primary for a trustworthy, premium feel
+ */
+:root {
+  --background: oklch(0.99 0.002 270);
+  --foreground: oklch(0.15 0.02 270);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.02 270);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.02 270);
+  
+  /* Primary — Deep indigo-blue for trust and sophistication */
+  --primary: oklch(0.45 0.18 265);
+  --primary-foreground: oklch(0.99 0 0);
+  
+  /* Secondary — Soft lavender-gray */
+  --secondary: oklch(0.96 0.01 270);
+  --secondary-foreground: oklch(0.25 0.02 270);
+  
+  /* Muted — Subtle background tone */
+  --muted: oklch(0.97 0.005 270);
+  --muted-foreground: oklch(0.50 0.02 270);
+  
+  /* Accent — Light violet highlight */
+  --accent: oklch(0.95 0.03 280);
+  --accent-foreground: oklch(0.30 0.10 265);
+  
+  --destructive: oklch(0.58 0.22 25);
+  --border: oklch(0.92 0.01 270);
+  --input: oklch(0.92 0.01 270);
+  --ring: oklch(0.55 0.18 265);
+  
+  /* Charts — Curated color palette */
+  --chart-1: oklch(0.55 0.18 265);
+  --chart-2: oklch(0.65 0.15 170);
+  --chart-3: oklch(0.60 0.20 320);
+  --chart-4: oklch(0.70 0.15 80);
+  --chart-5: oklch(0.55 0.15 30);
+  
+  --radius: 0.75rem;
+  
+  /* Brand — Matching primary */
+  --brand: oklch(0.50 0.20 265);
+  --brand-foreground: oklch(0.99 0 0);
+  
+  /* Semantic colors */
+  --success: oklch(0.55 0.18 155);
+  --success-foreground: oklch(0.99 0 0);
+  --warning: oklch(0.70 0.18 80);
+  --warning-foreground: oklch(0.20 0.05 80);
+  
+  --sidebar: oklch(0.985 0.005 270);
+  --sidebar-foreground: oklch(0.15 0.02 270);
+  --sidebar-primary: oklch(0.45 0.18 265);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.95 0.03 280);
+  --sidebar-accent-foreground: oklch(0.30 0.10 265);
+  --sidebar-border: oklch(0.92 0.01 270);
+  --sidebar-ring: oklch(0.55 0.18 265);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* ──────────────────────────────────────────────
+   Custom Utility Classes
+   ────────────────────────────────────────────── */
+
+/* Glass effect for cards */
+@layer utilities {
+  .glass {
+    background: oklch(1 0 0 / 80%);
+    backdrop-filter: blur(12px);
+    border: 1px solid oklch(0.92 0.01 270);
+  }
+
+  /* Subtle gradient background */
+  .bg-gradient-mesh {
+    background: 
+      radial-gradient(ellipse at 20% 0%, oklch(0.95 0.05 280 / 30%) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, oklch(0.95 0.05 200 / 20%) 0%, transparent 50%),
+      oklch(0.99 0.002 270);
+  }
+
+  /* Smooth card hover effect */
+  .card-hover {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-hover:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px -4px oklch(0 0 0 / 8%);
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    background: linear-gradient(135deg, oklch(0.45 0.18 265), oklch(0.55 0.20 300));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Subtle shimmer animation for loading */
+  .shimmer {
+    animation: shimmer 2s ease-in-out infinite;
+    background: linear-gradient(
+      90deg,
+      oklch(0.97 0 0) 0%,
+      oklch(0.93 0.01 270) 50%,
+      oklch(0.97 0 0) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Fade-in animation */
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Slide-up animation */
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Pulse dot for status indicators */
+  .pulse-dot {
+    animation: pulseDot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+  }
+}
