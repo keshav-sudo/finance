@@ -19,12 +19,13 @@ import { TransactionExtractor } from "@/components/transaction-extractor";
 import { TransactionTable } from "@/components/transaction-table";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import type { Transaction } from "@/lib/api";
+import { type Transaction, getCurrentUser } from "@/lib/api";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { data: session, isPending } = useSession();
   const [refreshKey, setRefreshKey] = useState(0);
+  const [orgName, setOrgName] = useState<string>("");
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -32,6 +33,15 @@ export default function DashboardPage() {
       router.push("/login");
     }
   }, [session, isPending, router]);
+
+  // Fetch current user details including active workspace name
+  useEffect(() => {
+    if (session) {
+      getCurrentUser()
+        .then((user) => setOrgName(user.organizationName))
+        .catch((err) => console.error("Failed to fetch organization context:", err));
+    }
+  }, [session]);
 
   /** Called after a new transaction is extracted to refresh the table */
   const handleTransactionExtracted = useCallback((_transaction: Transaction) => {
@@ -102,10 +112,15 @@ export default function DashboardPage() {
                   <path d="M7 7a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3l-2-2" />
                 </svg>
               </div>
-              <div>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                 <h1 className="text-lg font-semibold tracking-tight">
                   Vessify Finance
                 </h1>
+                {orgName && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary border border-primary/20 animate-fade-in">
+                    Workspace: {orgName}
+                  </span>
+                )}
               </div>
             </div>
 
