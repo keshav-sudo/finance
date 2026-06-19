@@ -18,10 +18,19 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import app from '../src/app.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Build the full URL from Vercel's request
+  // Build the full URL from Vercel's request, stripping the /_/backend route prefix so Hono matches routes correctly
   const host = req.headers.host ?? 'localhost';
   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-  const url = new URL(req.url ?? '/', `${protocol}://${host}`);
+  let path = req.url ?? '/';
+  if (path.startsWith('/_/backend')) {
+    path = path.substring('/_/backend'.length);
+  }
+  // Ensure path starts with a slash
+  if (!path.startsWith('/')) {
+    path = '/' + path;
+  }
+  
+  const url = new URL(path, `${protocol}://${host}`);
 
   // Collect the body (Vercel parses JSON automatically, we need to re-serialize)
   let body: string | undefined;
